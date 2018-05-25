@@ -1,7 +1,9 @@
-package com.coderpig.drysisters;
+package com.coderpig.drysisters.imgloader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.ImageView;
@@ -38,6 +40,13 @@ public class PictureLoader {
     public void load(ImageView loadImg, String imgUrl) {
         this.loadImg = loadImg;
         this.imgUrl = imgUrl;
+        Drawable drawable = loadImg.getDrawable();
+        if(drawable != null && drawable instanceof BitmapDrawable) {
+            Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+            if(bitmap != null && !bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
         new Thread(runnable).start();
     }
 
@@ -55,7 +64,7 @@ public class PictureLoader {
                     InputStream in = conn.getInputStream();
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     byte[] bytes = new byte[1024];
-                    int length = -1;
+                    int length;
                     while ((length = in.read(bytes)) != -1) {
                         out.write(bytes, 0, length);
                     }
